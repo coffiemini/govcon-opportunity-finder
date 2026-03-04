@@ -1,12 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+
 const SAM_SEARCH_URL = 'https://api.sam.gov/prod/opportunities/v2/search'
-function toSamDate(d: Date) {
-const mm = String(d.getMonth() + 1).padStart(2, '0')
-const dd = String(d.getDate()).padStart(2, '0')
-const yyyy = d.getFullYear()
-return `${mm}/${dd}/${yyyy}`
-}
 function asDate(value: any): string | null {
 if (!value) return null
 const d = new Date(value)
@@ -20,6 +15,13 @@ if (typeof v === 'string' && v.trim()) return v.trim()
 }
 return null
 }
+function toSamDate(d: Date) {
+const mm = String(d.getMonth() + 1).padStart(2, '0')
+const dd = String(d.getDate()).padStart(2, '0')
+const yyyy = d.getFullYear()
+return `${mm}/${dd}/${yyyy}`
+}
+
 function mapSamNoticeToOpportunity(notice: Record<string, any>) {
 return {
 notice_id: pick(notice.noticeId, notice.solicitationNumber, notice.id) ?? crypto.randomUUID(),
@@ -58,7 +60,6 @@ const limit = Math.min(Math.max(Number(body?.limit ?? 100), 1), 1000)
 
 const postedToDate = new Date()
 const postedFromDate = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000)
-
 const params = new URLSearchParams({
 api_key: apiKey,
 limit: String(limit),
@@ -72,7 +73,6 @@ method: 'GET',
 headers: { Accept: 'application/json' },
 cache: 'no-store'
 })
-
 if (!samRes.ok) {
 const text = await samRes.text()
 return NextResponse.json({ error: `SAM API ${samRes.status}: ${text.slice(0, 300)}` }, { status: 500 })
@@ -88,7 +88,6 @@ const { error } = await supabase
 .upsert(rows, { onConflict: 'notice_id', ignoreDuplicates: false })
 
 if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-
 return NextResponse.json({ ok: true, fetched: notices.length, upserted: rows.length })
 } catch (err: any) {
 return NextResponse.json({ error: err?.message ?? 'Unknown error' }, { status: 500 })
