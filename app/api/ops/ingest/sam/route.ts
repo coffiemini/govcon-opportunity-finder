@@ -10,6 +10,12 @@ if (Number.isNaN(d.getTime())) return null
 return d.toISOString()
 }
 
+function toNumberOrNull(value: any): number | null {
+if (value === null || value === undefined || value === '') return null
+const n = Number(value)
+return Number.isFinite(n) ? n : null
+}
+
 function pick(...values: any[]): string | null {
 for (const v of values) {
 if (typeof v === 'string' && v.trim()) return v.trim()
@@ -35,7 +41,7 @@ naics_code: pick(notice.naicsCode, notice.naics),
 set_aside: pick(notice.typeOfSetAsideDescription, notice.typeOfSetAside),
 response_deadline: asDate(notice.responseDeadLine),
 posted_date: asDate(notice.postedDate),
-award_amount: notice?.award?.amount ?? null,
+award_amount: toNumberOrNull(notice?.award?.amount),
 place_of_performance: pick(notice.placeOfPerformance, notice.popAddress),
 contact_name: pick(notice.pointOfContact, notice.contactName),
 contact_email: pick(notice.contactEmail),
