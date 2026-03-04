@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 const SAM_SEARCH_URL = 'https://api.sam.gov/prod/opportunities/v2/search'
-
+function toSamDate(d: Date) {
+const mm = String(d.getMonth() + 1).padStart(2, '0')
+const dd = String(d.getDate()).padStart(2, '0')
+const yyyy = d.getFullYear()
+return `${mm}/${dd}/${yyyy}`
+}
 function asDate(value: any): string | null {
 if (!value) return null
 const d = new Date(value)
@@ -58,8 +63,8 @@ const params = new URLSearchParams({
 api_key: apiKey,
 limit: String(limit),
 offset: '0',
-postedFrom: postedFromDate.toISOString().slice(0, 10),
-postedTo: postedToDate.toISOString().slice(0, 10)
+postedFrom: toSamDate(postedFromDate),
+postedTo: toSamDate(postedToDate)().slice(0, 10)
 })
 
 const samRes = await fetch(`${SAM_SEARCH_URL}?${params.toString()}`, {
