@@ -90,6 +90,14 @@ const { error } = await supabase
 if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 return NextResponse.json({ ok: true, fetched: notices.length, upserted: rows.length })
 } catch (err: any) {
-return NextResponse.json({ error: err?.message ?? 'Unknown error' }, { status: 500 })
+return NextResponse.json(
+{
+error: err?.message || String(err) || 'Unknown error',
+details: {
+name: err?.name ?? null,
+stack: err?.stack?.split('\n').slice(0, 3) ?? null
 }
+},
+{ status: 500 }
+)
 }
