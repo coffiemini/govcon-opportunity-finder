@@ -64,7 +64,7 @@ api_key: apiKey,
 limit: String(limit),
 offset: '0',
 postedFrom: toSamDate(postedFromDate),
-postedTo: toSamDate(postedToDate)().slice(0, 10)
+postedTo: toSamDate(postedToDate)
 })
 
 const samRes = await fetch(`${SAM_SEARCH_URL}?${params.toString()}`, {
